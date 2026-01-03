@@ -1,0 +1,17 @@
+![Simple Web Stack](YOUR_IMAGE_URL_HERE)
+
+## Specifics
+
+* **What is a server**: A server is a computer hardware or software (virtual machine) that provides functionality for other programs or devices, called "clients". In this infrastructure, it is the physical machine (IP 8.8.8.8) hosting the entire web stack.
+* **What is the role of the domain name**: It serves as a human-readable alias for the IP address. It allows users to access the website using a memorable string (`foobar.com`) instead of remembering the numeric IP address (`8.8.8.8`).
+* **What type of DNS record `www` is in `www.foobar.com`**: It is an **A record** because it points a hostname (`www.foobar.com`) directly to an IPv4 address (`8.8.8.8`).
+* **What is the role of the web server**: The web server (Nginx) accepts HTTP requests from the client. It serves static content (like HTML, CSS, images) directly and passes dynamic requests to the application server.
+* **What is the role of the application server**: The application server executes the business logic of the website. It runs the code base (Application Files), processes dynamic requests, and interacts with the database to generate the content sent back to the user.
+* **What is the role of the database**: The database (MySQL) allows for the persistent storage, organization, and retrieval of data (such as user information or posts) required by the application.
+* **What is the server using to communicate with the computer of the user requesting the website**: The server communicates with the client using the **HTTP** (Hypertext Transfer Protocol) protocol, typically over **TCP/IP**.
+
+## Issues
+
+* **SPOF (Single Point of Failure)**: The infrastructure resides on a single server. If this server fails (hardware failure, OS crash, or network issue), the entire website becomes unavailable. There is no redundancy.
+* **Downtime when maintenance needed**: Maintenance tasks, such as updating the operating system, patching the web server, or deploying new code, often require restarting services or the server itself. This results in downtime where the website is inaccessible to users.
+* **Cannot scale if too much incoming traffic**: The infrastructure is limited to the physical resources (CPU, RAM) of a single server. It cannot handle traffic spikes beyond what this single machine can process, and it does not support horizontal scaling (adding more servers).
