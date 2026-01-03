@@ -1,0 +1,22 @@
+![Distributed Web Infrastructure](https://github.com/BayramovaNazrin/holbertonschool-system_engineering-devops/blob/main/web_infrastructure_design/Untitled%20Diagram.drawio.png)
+
+## Specifics
+
+* **Why add a Load Balancer (HAProxy)**: The Load Balancer distributes incoming traffic across multiple servers. This prevents any single server from becoming a bottleneck and ensures the website remains accessible even if one web server fails.
+* **Why add a second Web/Application Server**: Adding a second server provides redundancy (preventing a total blackout if one server crashes) and increases the processing capacity to handle more concurrent users.
+* **Distribution Algorithm (Round Robin)**: The Load Balancer is configured with the **Round Robin** algorithm. It works by cycling through the list of servers sequentially. It sends the first request to Server 1, the second to Server 2, the third back to Server 1, and so on. This ensures an equal distribution of traffic.
+* **Active-Active vs Active-Passive**: The Load Balancer enables an **Active-Active** setup.
+    * **Active-Active**: Both servers handle traffic simultaneously.
+    * **Active-Passive**: One server handles traffic while the other remains idle, waiting to take over only if the primary fails.
+* **How a Database Primary-Replica (Master-Slave) Cluster works**: The Primary (Master) database handles all **Write** operations (INSERT, UPDATE, DELETE). The Replica (Slave) database copies (replicates) data from the Primary and handles **Read** operations (SELECT).
+* **Difference between Primary and Replica nodes**: The Application writes data only to the Primary node. The Application reads data from the Replica node to reduce load on the Primary.
+
+## Issues
+
+* **SPOF (Single Points of Failure)**:
+    * **The Load Balancer**: If the HAProxy server fails, the entire website becomes unreachable because it is the only entry point.
+    * **The Master Database**: If the Primary DB fails, the site effectively becomes "Read-Only" (users cannot sign up or post) until a new Master is promoted.
+* **Security Issues**:
+    * **No Firewall**: There is no packet filtering to block unauthorized access or close dangerous ports (like 22).
+    * **No HTTPS**: Traffic is unencrypted (HTTP). Data like passwords can be intercepted by hackers.
+* **No Monitoring**: There is no visibility into server health (CPU, RAM, Status). We won't know if a server is down or slow until users complain.
