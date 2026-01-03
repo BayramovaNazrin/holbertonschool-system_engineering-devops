@@ -1,0 +1,22 @@
+![Scale Up Infrastructure](web_infrastructure_design/photo1.png)
+
+## Specifics
+
+* **Why add a specific Web Server (Nginx)**: Splitting the web server from the application server allows us to handle static content (HTML, CSS, Images) much faster. Nginx is optimized for high concurrency of static files, while the Application Server is optimized for logic. This separation allows us to scale them independently (e.g., if we have many static requests, we just add more Nginx servers).
+* **Why add a specific Application Server**: The Application Server handles the dynamic business logic (calculating prices, processing logins). By isolating it, we ensure that heavy processing tasks don't slow down the delivery of static files. It also improves security by keeping the code base further away from the public internet.
+* **Why add a Load Balancer Cluster (HAProxy)**: Adding a second HAProxy server creates a High Availability (HA) cluster. If the primary Load Balancer fails, the backup Load Balancer automatically takes over (Failover). This eliminates the Load Balancer as a Single Point of Failure (SPOF).
+* **Why split components (Web, App, DB) with their own servers**:
+    * **Resource Isolation**: A memory leak in the Application code won't crash the Database. Heavy Database writes won't slow down static file serving.
+    * **Independent Scaling**: We can scale the layer that needs it. If the database is the bottleneck, we add more DB servers (or read replicas) without paying for unnecessary Web or App servers.
+    * **Security**: We can configure firewalls more strictly. The Database only needs to talk to the App Server, not the Web Server or the outside world.
+
+## Application Server vs Web Server
+
+* **Web Server (Nginx/Apache)**:
+    * **Primary Role**: Serves **static content** (files that don't change, like HTML, CSS, Images).
+    * **Protocol**: Primarily speaks HTTP/HTTPS.
+    * **Function**: Accepts requests from the user, serves the file if it exists, or acts as a "Reverse Proxy" to pass dynamic requests to the Application Server.
+* **Application Server (Gunicorn/Node.js/Tomcat)**:
+    * **Primary Role**: Generates **dynamic content** by executing business logic.
+    * **Protocol**: Often speaks specific protocols (like WSGI for Python) to communicate with the Web Server.
+    * **Function**: Runs the code, queries the database, processes data, and constructs the HTML page to send back to the Web Server.
