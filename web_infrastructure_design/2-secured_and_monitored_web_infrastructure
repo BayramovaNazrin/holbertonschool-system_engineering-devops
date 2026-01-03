@@ -1,0 +1,23 @@
+![Secured and Monitored Web Infrastructure](web_infrastructure_design/Untitled Diagram.drawio (1).png)
+
+## Specifics
+
+* **Why add Firewalls**: Firewalls are added to filter incoming and outgoing network traffic. They act as a security barrier, allowing only authorized traffic (like HTTP/HTTPS on ports 80/443) and blocking unauthorized access (like attackers trying to connect on obscure ports).
+* **Why add an SSL Certificate**: The SSL certificate is required to enable **HTTPS**. It encrypts the traffic between the user's browser and the server, ensuring that sensitive data (like passwords or credit card numbers) cannot be intercepted or read by "Man-in-the-Middle" attackers.
+* **Why add Monitoring Clients**: Monitoring clients are added to collect real-time data about the servers' performance and health. This allows administrators to be alerted immediately if a server goes down, runs out of disk space, or experiences a spike in error rates.
+* **What are Firewalls for**: A firewall is a network security device that monitors and controls network traffic based on predetermined security rules. It prevents unauthorized access to the private network.
+* **Why is traffic served over HTTPS**: Traffic is served over HTTPS to ensure **Confidentiality** (data is encrypted), **Integrity** (data is not tampered with), and **Authentication** (verifying the server is who it claims to be).
+* **What monitoring is used for**: Monitoring is used to observe the system's status, performance, and reliability over time. It helps in capacity planning, debugging errors, and ensuring high availability.
+* **How the monitoring tool is collecting data**: The monitoring client (agent) installed on each server reads system metrics (CPU, RAM, Disk) and log files. It sends this data to a central server (like Sumo Logic or Datadog), where it is processed and visualized on a dashboard.
+* **How to monitor web server QPS**: To monitor QPS (Queries Per Second), the monitoring agent can parse the web server's (Nginx) access logs in real-time. It counts the number of HTTP requests received each second and sends this metric to the monitoring dashboard.
+
+## Issues
+
+* **Terminating SSL at the load balancer level**:
+    * **The Issue**: Decryption happens at the Load Balancer. The traffic traveling from the Load Balancer to the Application Servers is unencrypted (plain HTTP).
+    * **The Risk**: If an attacker manages to penetrate the internal network (behind the firewalls), they can sniff the unencrypted traffic and steal sensitive user data. Ideally, traffic should be re-encrypted or the network must be strictly isolated.
+* **Having only one MySQL server capable of accepting writes**:
+    * **The Issue**: This is still a Single Point of Failure (SPOF) for **Write** operations. If the Master database fails, no new data can be saved. The replicas can only handle reads.
+* **Having servers with all the same components (database, web server, and application server)**:
+    * **The Issue**: This "Monolithic" server design causes resource contention. If the Database consumes all the CPU, the Web Server will slow down too.
+    * **Scalability**: You cannot scale components independently. If you need more Database storage, you are forced to add a whole new server with Nginx and App Server (which you might not need), leading to wasted resources.
